@@ -135,6 +135,10 @@ void PDFDisplay :: moveDown(const int offset)
     {
         int HeightRemain = PDF.pageSize(LastPageShown, DPI).height()
             - ViewPortBotInLastPageY;
+        if(HeightRemain == 0)
+        {
+            return;
+        }
         if(LastPageShown == PDF.totalPages() - 1 && HeightRemain < offset)
         {
             Offset = HeightRemain;
@@ -143,7 +147,7 @@ void PDFDisplay :: moveDown(const int offset)
     int NewTopLeftY = ViewPortTopLeftInPage.y() + Offset;
     {
         int HeightRemain = PDF.pageSize(CurrentPage, DPI).height() - ViewPortTopLeftInPage.y() - Offset;
-        if(HeightRemain <= 0)
+        if(HeightRemain < 0)
         {
             CurrentPage++;
             NewTopLeftY = -HeightRemain - Config.offsetBetweenPages();
@@ -179,9 +183,72 @@ void PDFDisplay :: moveDown(const int offset)
     return;
 }
 
+void PDFDisplay :: moveUp(const int offset)
+{
+    std::cerr << "Entering PDFDisplay :: moveUp with offset = " << offset << std::endl;
+    int Offset = offset;
+    {
+        int HeightRemain = ViewPortTopLeftInPage.y();
+        if(CurrentPage == 0 && HeightRemain < offset)
+        {
+            Offset = HeightRemain;
+        }
+    }
+    int NewTopLeftY = ViewPortTopLeftInPage.y() - Offset;
+    {
+        int HeightRemain = ViewPortTopLeftInPage.y() - Offset;
+        if(HeightRemain < 0)
+        {
+            CurrentPage--;
+            NewTopLeftY = PDF.pageSize(CurrentPage, DPI).height() + HeightRemain
+                + Config.offsetBetweenPages();
+        }
+        else if(HeightRemain == 0)
+        {
+            return;
+        }
+    }
+    
+    // Specify the region on the widget to reuse.
+    QRect RegionToReuse = rect();
+    RegionToReuse.adjust(0, 0, 0, -Offset);
+    std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
+              << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
+    // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
+    //                       RegionToReuse.width(), RegionToReuse.height());
+    // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
+
+    QPainter Renderer(&CurrentImg);
+    Renderer.drawPixmap(QPoint(0, Offset), CurrentImg, RegionToReuse);
+    Renderer.end();
+
+    // Render new contents
+    renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), NewTopLeftY),
+              QRect(0, 0, width(), Offset));
+    ViewPortTopLeftInPage.setY(NewTopLeftY);
+    updateLastPageShownInfo();
+    std::cerr << "Last page becomes " << LastPageShown
+              << ", with y-offset " << ViewPortBotInLastPageY << std::endl;
+    
+    // CurrentImg.save("test.png");
+    repaint();
+
+    std::cerr << "Leaving PDFDisplay :: moveUp." << std::endl;
+    return;
+}
+
 void PDFDisplay :: keyPressEvent(QKeyEvent* event)
 {
-    if(event -> key() == Qt::Key_J)
-        moveDown(32);
+    switch(event -> key())
+    {
+        case Qt::Key_J:
+            moveDown(32);
+            break;
+        case Qt::Key_K:
+            moveUp(32);
+            break;
+        default:
+            break;
+    }
     return;
 }
