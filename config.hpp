@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 class PDFViewerConfig
 {
 private:
@@ -14,3 +17,6 @@ public:
     int offsetBetweenPages() { return OffsetBetweenPages; }
     void setOffsetBetweenPages(const int offset);
 };
+
+
+#endif

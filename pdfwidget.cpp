@@ -3,16 +3,16 @@
 #include <time.h>
 #include "pdfwidget.hpp"
 
-PDFDisplay :: PDFDisplay(const QString& filename, PDFViewerConfig& config, QWidget* parent)
-: Config(config), QWidget(parent)
+PDFDisplay :: PDFDisplay(const QString& filename, const int initial_dpi,
+                         const int offset_between_pages, QWidget* parent)
+: DPI(initial_dpi), OffsetBetweenPages(offset_between_pages), QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setStyleSheet("background-color: blue;");
+    // setStyleSheet("background-color: blue;");
 
     PDF.loadFromFile(filename);
     CurrentPage = 0;
     LastPageShown = 0;
-    DPI = Config.initialDPI();
     ViewPortTopLeftInPage.setX(0);
     ViewPortTopLeftInPage.setY(0);
 }
@@ -32,16 +32,16 @@ void PDFDisplay :: updateLastPageShownInfo()
     QSize PageSize = PDF.pageSize(CurrentPage, DPI);
     int HeightRemain = height() - (PageSize.height()
                                    - ViewPortTopLeftInPage.y())
-        - Config.offsetBetweenPages();
+        - OffsetBetweenPages;
     int LastPage = CurrentPage;
     while(HeightRemain > 0)
     {
         LastPage++;
-        HeightRemain -= PDF.pageSize(LastPage, DPI).height() + Config.offsetBetweenPages();
+        HeightRemain -= PDF.pageSize(LastPage, DPI).height() + OffsetBetweenPages;
     }
 
     LastPageShown = LastPage;
-    ViewPortBotInLastPageY = PDF.pageSize(LastPage, DPI).height() + HeightRemain + Config.offsetBetweenPages();
+    ViewPortBotInLastPageY = PDF.pageSize(LastPage, DPI).height() + HeightRemain + OffsetBetweenPages;
 
     return;
 }
@@ -82,7 +82,7 @@ void PDFDisplay :: renderPDF(const int page,
 
         Renderer.drawImage(region_on_widget.x(), region_on_widget.y(), RenderedImg);
         
-        HeightRemain -= RenderedImg.height() + Config.offsetBetweenPages();
+        HeightRemain -= RenderedImg.height() + OffsetBetweenPages;
         PageToRender++;
     }
     
@@ -150,7 +150,7 @@ void PDFDisplay :: moveDown(const int offset)
         if(HeightRemain < 0)
         {
             CurrentPage++;
-            NewTopLeftY = -HeightRemain - Config.offsetBetweenPages();
+            NewTopLeftY = -HeightRemain - OffsetBetweenPages;
         }
     }
     
@@ -201,7 +201,7 @@ void PDFDisplay :: moveUp(const int offset)
         {
             CurrentPage--;
             NewTopLeftY = PDF.pageSize(CurrentPage, DPI).height() + HeightRemain
-                + Config.offsetBetweenPages();
+                + OffsetBetweenPages;
         }
         else if(HeightRemain == 0)
         {
@@ -234,21 +234,5 @@ void PDFDisplay :: moveUp(const int offset)
     repaint();
 
     std::cerr << "Leaving PDFDisplay :: moveUp." << std::endl;
-    return;
-}
-
-void PDFDisplay :: keyPressEvent(QKeyEvent* event)
-{
-    switch(event -> key())
-    {
-        case Qt::Key_J:
-            moveDown(32);
-            break;
-        case Qt::Key_K:
-            moveUp(32);
-            break;
-        default:
-            break;
-    }
     return;
 }

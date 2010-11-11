@@ -1,3 +1,6 @@
+#ifndef PDFRENDERER_H
+#define PDFRENDERER_H
+
 #include <QString>
 #include <QImage>
 #include <poppler-qt4.h>
@@ -23,3 +26,4 @@ public:
     QSize pageSize(const int pagenum, const int dpi);
 };
 
+#endif
