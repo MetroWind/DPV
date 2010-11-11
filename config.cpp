@@ -3,9 +3,24 @@
 
 PDFViewerConfig :: PDFViewerConfig()
 {
-    InitialDPI = 113;
-    OffsetBetweenPages = 4;
+    // ============================================================
+    // ------------------- Specify options below ------------------
+    // ============================================================
+    InitialDPI = 113;           // Initial DPI, dah~
+    OffsetBetweenPages = 4;     // The space between two adjacent pages
+    MoveStep = 32;              // The distance
+
+    // ============================================================
+    // -------------------- Key Bindings --------------------------
+    // ============================================================
+    KeyBindings["j"] = "moveDown";
+    KeyBindings["k"] = "moveUp";
 }
+
+// ============================================================
+// ---------------- Option defintions stops here --------------
+// ============================================================
+// ============================================================
 
 void PDFViewerConfig :: setInitialDPI(const int dpi)
 {
