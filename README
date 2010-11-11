@@ -5,6 +5,11 @@ DPV Readme
 DPV is abbreviation for "<your favorite word starting with 'd'> PDF
 Viewer".  It is supposed to be minimal, or even less than that.
 
+* Compilation
+
+$ qmake
+$ make
+
 * Usage
 
 dpv filename
@@ -23,8 +28,10 @@ to function pointers (FuncPt).
 
 The user specifies key bindings in the constructor of PDFViewerConfig
 in purely human-readable form.  Then in the constructor of PDFWindow,
-the keys of PDFViewerConfig::KeyBindings are converted to
-QKeySequence objects, and the values are converted to function
-pointers.  Then these converted objects are bind in
-PDFWindow::KeyBind.  As a result, functions can be called with speed,
-yet it is very convenient for the user to specify key bindings.
+the keys of PDFViewerConfig::KeyBindings are converted to QKeySequence
+objects, and the values are converted to function pointers.  Then
+these converted objects are bind in PDFWindow::KeyBind.  Note that
+these functions are friends of PDFWindow in order to access the
+private member PDFWindow::PDF.  As a result, functions can be called
+with speed, yet it is very convenient for the user to specify key
+bindings.
