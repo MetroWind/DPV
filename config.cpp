@@ -8,13 +8,18 @@ PDFViewerConfig :: PDFViewerConfig()
     // ============================================================
     InitialDPI = 113;           // Initial DPI, dah~
     OffsetBetweenPages = 4;     // The space between two adjacent pages
-    MoveStep = 32;              // The distance
+    MoveStep = 32;              // The distance of normal navigational move
+    PageScrollKeep = 32;        // Number of pixels in what you are
+                                // seeing now to remain visible after
+                                // a page scroll.
 
     // ============================================================
     // -------------------- Key Bindings --------------------------
     // ============================================================
     KeyBindings["j"] = "moveDown";
     KeyBindings["k"] = "moveUp";
+    KeyBindings["Ctrl+v"] = "pageDown";
+    KeyBindings["Alt+v"] = "pageUp";
 }
 
 // ============================================================

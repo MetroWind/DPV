@@ -153,20 +153,23 @@ void PDFDisplay :: moveDown(const int offset)
             NewTopLeftY = -HeightRemain - OffsetBetweenPages;
         }
     }
+
+    if(Offset < height())
+    {                    // We can reuse part of the rendering.
+        // Specify the region on the widget to reuse.
+        QRect RegionToReuse = rect();
+        RegionToReuse.adjust(0, Offset, 0, 0);
+        std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
+                  << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
+        // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
+        //                       RegionToReuse.width(), RegionToReuse.height());
+        // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
+
+        QPainter Renderer(&CurrentImg);
+        Renderer.drawPixmap(QPoint(0, 0), CurrentImg, RegionToReuse);
+        Renderer.end();
+    }
     
-    // Specify the region on the widget to reuse.
-    QRect RegionToReuse = rect();
-    RegionToReuse.adjust(0, Offset, 0, 0);
-    std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
-              << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
-    // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
-    //                       RegionToReuse.width(), RegionToReuse.height());
-    // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
-
-    QPainter Renderer(&CurrentImg);
-    Renderer.drawPixmap(QPoint(0, 0), CurrentImg, RegionToReuse);
-    Renderer.end();
-
     // Render new contents
     renderPDF(LastPageShown, QPoint(ViewPortTopLeftInPage.x(),
                                     ViewPortBotInLastPageY),
@@ -208,20 +211,23 @@ void PDFDisplay :: moveUp(const int offset)
             return;
         }
     }
+
+    if(Offset < height())
+    {
+        // Specify the region on the widget to reuse.
+        QRect RegionToReuse = rect();
+        RegionToReuse.adjust(0, 0, 0, -Offset);
+        std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
+                  << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
+        // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
+        //                       RegionToReuse.width(), RegionToReuse.height());
+        // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
+
+        QPainter Renderer(&CurrentImg);
+        Renderer.drawPixmap(QPoint(0, Offset), CurrentImg, RegionToReuse);
+        Renderer.end();
+    }
     
-    // Specify the region on the widget to reuse.
-    QRect RegionToReuse = rect();
-    RegionToReuse.adjust(0, 0, 0, -Offset);
-    std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
-              << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
-    // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
-    //                       RegionToReuse.width(), RegionToReuse.height());
-    // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
-
-    QPainter Renderer(&CurrentImg);
-    Renderer.drawPixmap(QPoint(0, Offset), CurrentImg, RegionToReuse);
-    Renderer.end();
-
     // Render new contents
     renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), NewTopLeftY),
               QRect(0, 0, width(), Offset));

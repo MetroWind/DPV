@@ -7,10 +7,11 @@
 
 class PDFWindow : public QWidget
 {
-private:
+public:
     typedef void (*FuncPt) (PDFWindow&);
     typedef std::map<QKeySequence, FuncPt> KeyBind;
 
+private:
     PDFDisplay PDF;
     QVBoxLayout Layout;
     PDFViewerConfig& Config;
@@ -30,11 +31,18 @@ public:
 
     friend void moveDown(PDFWindow& pdf_win);
     friend void moveUp(PDFWindow& pdf_win);
+    friend void pageDown(PDFWindow& pdf_win);
+    friend void pageUp(PDFWindow& pdf_win);
 };
 
 void defaultAction(PDFWindow& pdf_win);
     
 void moveDown(PDFWindow& pdf_win);
 void moveUp(PDFWindow& pdf_win);
+void pageDown(PDFWindow& pdf_win);
+void pageUp(PDFWindow& pdf_win);
+
+typedef std::map<QString, PDFWindow::FuncPt> FuncNameMap;
+static FuncNameMap NameToFunc;
 
 #endif

@@ -24,7 +24,7 @@ void PDFWindow :: resizeEvent(QResizeEvent* event)
 
 void PDFWindow :: keyPressEvent(QKeyEvent* event)
 {
-    QKeySequence Seq(event -> key(), event -> modifiers());
+    QKeySequence Seq(event -> key() + event -> modifiers());
     if(KeyBindings.find(Seq) == KeyBindings.end())
     {
         defaultAction(*this);
@@ -37,16 +37,21 @@ void PDFWindow :: keyPressEvent(QKeyEvent* event)
 
 PDFWindow::FuncPt PDFWindow :: funcFromString(const QString& str)
 {
-    if(str == QString("moveDown"))
-        return moveDown;
-    else if(str == QString("moveUp"))
-        return moveUp;
-    
+    if(NameToFunc.find(str) != NameToFunc.end())
+    {
+        return NameToFunc[str];
+    }
+        
     return 0;
 }
 
 void PDFWindow :: bindKeys()
 {
+    NameToFunc["moveDown"] = moveDown;
+    NameToFunc["moveUp"] = moveUp;
+    NameToFunc["pageDown"] = pageDown;
+    NameToFunc["pageUp"] = pageUp;
+
     KeyMap::iterator Key;
     KeyMap& Keys = Config.keyBindings();
     for(Key = Keys.begin(); Key != Keys.end(); Key++)
@@ -72,5 +77,16 @@ void moveDown(PDFWindow& pdf_win)
 void moveUp(PDFWindow& pdf_win)
 {
     pdf_win.PDF.moveUp(pdf_win.Config.moveStep());
+    return;
+}
+
+void pageDown(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.moveDown(pdf_win.PDF.height() - pdf_win.Config.pageScrollKeep());
+    return;
+}
+void pageUp(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.moveUp(pdf_win.PDF.height() - pdf_win.Config.pageScrollKeep());
     return;
 }
