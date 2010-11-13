@@ -56,6 +56,8 @@ QImage PDFRenderer :: render(const int page, const int dpi,
     QSize PageSize = pageSize(CurrentPage, dpi);
     int Width = width;
     int Height = height;
+    QImage Result;
+
     if(PageSize.width() < Width)
     {
         Width = PageSize.width();
@@ -64,8 +66,7 @@ QImage PDFRenderer :: render(const int page, const int dpi,
     {
         Height = PageSize.height();
     }
-
-    QImage Result;
+    
     Result = CurrentPage -> renderToImage(dpi, dpi, x, y, Width, Height);
 
     std::cerr << "Leaving PDFRenderer :: render" << std::endl;
@@ -97,4 +98,80 @@ QSize PDFRenderer :: pageSize(const int pagenum, const int dpi)
     Size.rwidth() *= double(dpi) / double(72);
     Size.rheight() *= double(dpi) / double(72);
     return Size;
+}
+
+VerticalPosInPDF PDFRenderer :: PosInPDFFromHere(
+    const int dpi, const int page, const int y, const int offset_between_pages,
+    const int offset)
+{
+    assert(offset != 0);
+    int OffsetRemain = offset;
+    int CurrentPage = page;
+    // bool isFirstPage = true;
+    int Y = y; // Where are we on the pdf in the current page?
+    int RealOffset = 0;
+    VerticalPosInPDF Result;
+    if(offset > 0)
+    {
+        while(OffsetRemain > 0)
+        {
+            QSize PageSize = pageSize(CurrentPage, dpi);
+            if(CurrentPage == totalPages() - 1 && OffsetRemain >= PageSize.height() - Y)
+            {                       // We are at the last page, and OffsetRemain is way too large.
+                RealOffset += PageSize.height() - Y;
+                Result.Page = CurrentPage;
+                Result.Y = PageSize.height();
+                Result.Offset = RealOffset;
+                return Result;
+            }
+            if(PageSize.height() - Y + offset_between_pages > OffsetRemain)
+            {                       // We don't have to go across page.
+                RealOffset += OffsetRemain;
+            
+                Result.Page = CurrentPage;
+                Result.Y = Y + OffsetRemain;
+                Result.Offset = RealOffset;
+                return Result;
+            }
+            // We have to go across page.
+            RealOffset += PageSize.height() - Y + offset_between_pages;
+            OffsetRemain -= PageSize.height() - Y + offset_between_pages;
+            Y = 0;
+            CurrentPage++;
+        }
+    }
+    else                        // Go up~
+    {
+        while(OffsetRemain < 0)
+        {
+            if(CurrentPage == 0 && -OffsetRemain >= Y)
+            {                       // We are at the first page, and OffsetRemain is way too large.
+                RealOffset -= Y;
+                Result.Page = CurrentPage;
+                Result.Y = 0;
+                Result.Offset = RealOffset;
+                return Result;
+            }
+            if(Y + offset_between_pages > -OffsetRemain)
+            {                       // We don't have to go across page.
+                RealOffset += OffsetRemain;
+            
+                Result.Page = CurrentPage;
+                Result.Y = Y + OffsetRemain;
+                Result.Offset = RealOffset;
+                return Result;
+            }
+            // We have to go across page.
+            RealOffset -= Y + offset_between_pages;
+            OffsetRemain += Y + offset_between_pages;
+            CurrentPage--;
+            QSize PageSize = pageSize(CurrentPage, dpi);            
+            Y = PageSize.height();
+        }
+    }
+    
+    Result.Page = CurrentPage;
+    Result.Y = Y;
+    Result.Offset = RealOffset;
+    return Result;
 }

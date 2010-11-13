@@ -5,6 +5,13 @@
 #include <QImage>
 #include <poppler-qt4.h>
 
+typedef struct _vert_pos_in_pdf
+{
+    int Page;
+    int Y;
+    int Offset;
+} VerticalPosInPDF;
+
 class PDFRenderer
 {
 private:
@@ -24,6 +31,8 @@ public:
 
     int totalPages();
     QSize pageSize(const int pagenum, const int dpi);
+    VerticalPosInPDF PosInPDFFromHere(const int dpi, const int page, const int y,
+                                      const int offset_between_pages, const int offset);
 };
 
 #endif

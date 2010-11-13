@@ -61,29 +61,31 @@ void PDFDisplay :: renderPDF(const int page,
     // Render!!
     int HeightRemain = region_on_widget.height();
     int PageToRender = page;
-    bool isFirstPage = true;
+    // bool isFirstPage = true;
+    int Y = offset_on_pdf.y(); // Where are we on the pdf in the current page?
     while(HeightRemain > 0 && PageToRender < PDF.totalPages())
     {
         QImage RenderedImg;
-        if(isFirstPage)
-        {
-            RenderedImg = PDF.render(PageToRender, DPI,
-                                     offset_on_pdf.x(), offset_on_pdf.y(),
-                                     region_on_widget.width(), HeightRemain);
-            RenderedImg.save("first.png");
-            isFirstPage = false;
+        QSize PageSize = PDF.pageSize(PageToRender, DPI);
+        // Do we need to go across pages? ...
+        if(HeightRemain - OffsetBetweenPages > PageSize.height() - Y)
+        {                       // ... Yes, we do.
+            RenderedImg = PDF.render(PageToRender, DPI, offset_on_pdf.x(), Y,
+                                     region_on_widget.width(), PageSize.height() - Y);
+            
         }
         else
-        {
-            RenderedImg = PDF.render(PageToRender, DPI,
-                                     offset_on_pdf.x(), 0,
+        {                       // ... No, we don't.  And this is the last we draw. ^_^
+            RenderedImg = PDF.render(PageToRender, DPI, offset_on_pdf.x(), Y,
                                      region_on_widget.width(), HeightRemain);
         }
+        Renderer.drawImage(region_on_widget.x(), region_on_widget.y()
+                           + region_on_widget.height() - HeightRemain, RenderedImg);
 
-        Renderer.drawImage(region_on_widget.x(), region_on_widget.y(), RenderedImg);
-        
-        HeightRemain -= RenderedImg.height() + OffsetBetweenPages;
-        PageToRender++;
+        HeightRemain -= PageSize.height() - Y;
+        HeightRemain -= OffsetBetweenPages;
+        PageToRender++;         // Go across page!
+        Y = 0;
     }
     
     std::cerr << "HeightRemain = " << HeightRemain << std::endl;
@@ -131,28 +133,14 @@ void PDFDisplay :: setDPI(const int dpi)
 void PDFDisplay :: moveDown(const int offset)
 {
     std::cerr << "Entering PDFDisplay :: moveDown with offset = " << offset << std::endl;
-    int Offset = offset;
-    {
-        int HeightRemain = PDF.pageSize(LastPageShown, DPI).height()
-            - ViewPortBotInLastPageY;
-        if(HeightRemain == 0)
-        {
-            return;
-        }
-        if(LastPageShown == PDF.totalPages() - 1 && HeightRemain < offset)
-        {
-            Offset = HeightRemain;
-        }
-    }
-    int NewTopLeftY = ViewPortTopLeftInPage.y() + Offset;
-    {
-        int HeightRemain = PDF.pageSize(CurrentPage, DPI).height() - ViewPortTopLeftInPage.y() - Offset;
-        if(HeightRemain < 0)
-        {
-            CurrentPage++;
-            NewTopLeftY = -HeightRemain - OffsetBetweenPages;
-        }
-    }
+    VerticalPosInPDF BotLeftDest = PDF.PosInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
+                                                        OffsetBetweenPages, offset);
+    
+    int Offset = BotLeftDest.Offset;
+    if(Offset == 0)
+        return;
+    VerticalPosInPDF TopLeftDest = PDF.PosInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
+                                                        OffsetBetweenPages, Offset);
 
     if(Offset < height())
     {                    // We can reuse part of the rendering.
@@ -174,8 +162,10 @@ void PDFDisplay :: moveDown(const int offset)
     renderPDF(LastPageShown, QPoint(ViewPortTopLeftInPage.x(),
                                     ViewPortBotInLastPageY),
               QRect(0, height() - Offset, width(), Offset));
-    ViewPortTopLeftInPage.setY(NewTopLeftY);
-    updateLastPageShownInfo();
+    CurrentPage = TopLeftDest.Page;
+    ViewPortTopLeftInPage.setY(TopLeftDest.Y);
+    LastPageShown = BotLeftDest.Page;
+    ViewPortBotInLastPageY = BotLeftDest.Y;
     std::cerr << "Last page becomes " << LastPageShown
               << ", with y-offset " << ViewPortBotInLastPageY << std::endl;
     
@@ -189,29 +179,15 @@ void PDFDisplay :: moveDown(const int offset)
 void PDFDisplay :: moveUp(const int offset)
 {
     std::cerr << "Entering PDFDisplay :: moveUp with offset = " << offset << std::endl;
-    int Offset = offset;
-    {
-        int HeightRemain = ViewPortTopLeftInPage.y();
-        if(CurrentPage == 0 && HeightRemain < offset)
-        {
-            Offset = HeightRemain;
-        }
-    }
-    int NewTopLeftY = ViewPortTopLeftInPage.y() - Offset;
-    {
-        int HeightRemain = ViewPortTopLeftInPage.y() - Offset;
-        if(HeightRemain < 0)
-        {
-            CurrentPage--;
-            NewTopLeftY = PDF.pageSize(CurrentPage, DPI).height() + HeightRemain
-                + OffsetBetweenPages;
-        }
-        else if(HeightRemain == 0)
-        {
-            return;
-        }
-    }
-
+    VerticalPosInPDF TopLeftDest = PDF.PosInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
+                                                        OffsetBetweenPages, -offset);
+    int Offset = -TopLeftDest.Offset; // Offset >= 0
+    if(Offset == 0)
+        return;
+    
+    VerticalPosInPDF BotLeftDest = PDF.PosInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
+                                                        OffsetBetweenPages, -Offset);
+    
     if(Offset < height())
     {
         // Specify the region on the widget to reuse.
@@ -229,10 +205,15 @@ void PDFDisplay :: moveUp(const int offset)
     }
     
     // Render new contents
-    renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), NewTopLeftY),
+    CurrentPage = TopLeftDest.Page;
+    ViewPortTopLeftInPage.setY(TopLeftDest.Y);
+    
+    renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), ViewPortTopLeftInPage.y()),
               QRect(0, 0, width(), Offset));
-    ViewPortTopLeftInPage.setY(NewTopLeftY);
-    updateLastPageShownInfo();
+
+    LastPageShown = BotLeftDest.Page;
+    ViewPortBotInLastPageY = BotLeftDest.Y;
+    
     std::cerr << "Last page becomes " << LastPageShown
               << ", with y-offset " << ViewPortBotInLastPageY << std::endl;
     
