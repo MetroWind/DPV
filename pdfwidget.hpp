@@ -40,6 +40,7 @@ public:
                    const QPoint& offset_on_pdf, const QRect& region_on_widget);
     void moveDown(const int offset);
     void moveUp(const int offset);
+    void goTo(const int page);
 };
 
 #endif

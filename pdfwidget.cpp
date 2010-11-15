@@ -195,9 +195,6 @@ void PDFDisplay :: moveUp(const int offset)
         RegionToReuse.adjust(0, 0, 0, -Offset);
         std::cerr << RegionToReuse.width() << 'x' << RegionToReuse.height() << '+'
                   << RegionToReuse.x() << '+' << RegionToReuse.y() << std::endl;
-        // CurrentImg.grabWindow(winId(), RegionToReuse.x(), RegionToReuse.y(),
-        //                       RegionToReuse.width(), RegionToReuse.height());
-        // render(&CurrentImg, QPoint(0, 0), QRegion(RegionToReuse), 0);
 
         QPainter Renderer(&CurrentImg);
         Renderer.drawPixmap(QPoint(0, Offset), CurrentImg, RegionToReuse);
@@ -221,5 +218,16 @@ void PDFDisplay :: moveUp(const int offset)
     repaint();
 
     std::cerr << "Leaving PDFDisplay :: moveUp." << std::endl;
+    return;
+}
+
+void PDFDisplay :: goTo(const int page)
+{
+    assert(0 <= page < PDF.totalPages());
+    CurrentPage = page;
+    ViewPortTopLeftInPage.setY(0);
+    ViewPortTopLeftInPage.setX(0);
+    updateLastPageShownInfo();
+    repaint();
     return;
 }

@@ -1,0 +1,4 @@
+Rewrite PDFDisplay :: updateLastPageShownInfo() to use PDFRenderer ::
+PosInPDFFromHere()?
+
+Add gotoPage.
