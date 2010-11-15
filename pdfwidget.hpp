@@ -22,6 +22,7 @@ private:
     const int OffsetBetweenPages;
 
     void updateLastPageShownInfo();
+    void forceRepaint();        // Updates `CurrentImg', but does not repaint.
     
 protected:
     void paintEvent(QPaintEvent* event);
@@ -33,7 +34,8 @@ public:
     ~PDFDisplay();
 
     void setDPI(const int dpi);
-
+    int currentPage() { return CurrentPage; }
+    
     // void loadFromFile(const QString& filename);
     // void renderPDF(QPainter& painter);
     void renderPDF(const int page,

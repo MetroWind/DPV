@@ -103,9 +103,7 @@ void PDFDisplay :: renderPDF(const int page,
 void PDFDisplay :: resizeEvent(QResizeEvent* event)
 {
     std::cerr << "Entering PDFDisplay :: resizeEvent." << std::endl;
-    CurrentImg = QPixmap(width(), height());
-    renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), ViewPortTopLeftInPage.y()),
-              QRect(0, 0, width(), height()));
+    forceRepaint();
     QWidget::resizeEvent(event);
     std::cerr << "Leaving PDFDisplay :: resizeEvent." << std::endl;
     updateLastPageShownInfo();
@@ -120,6 +118,14 @@ void PDFDisplay :: paintEvent(QPaintEvent* event)
     // Painter.setBackgroundMode(Qt::OpaqueMode);
     Painter.drawPixmap(0, 0, CurrentImg);
     Painter.end();
+    return;
+}
+
+void PDFDisplay :: forceRepaint()
+{
+    CurrentImg = QPixmap(width(), height());
+    renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), ViewPortTopLeftInPage.y()),
+              QRect(0, 0, width(), height()));
     return;
 }
 
@@ -223,11 +229,18 @@ void PDFDisplay :: moveUp(const int offset)
 
 void PDFDisplay :: goTo(const int page)
 {
-    assert(0 <= page < PDF.totalPages());
+    if(page < 0 || page >= PDF.totalPages())
+    {                           // If destination page is invalid, do
+                                // nothing.
+        return;
+    }
+    
     CurrentPage = page;
     ViewPortTopLeftInPage.setY(0);
     ViewPortTopLeftInPage.setX(0);
     updateLastPageShownInfo();
+
+    forceRepaint();
     repaint();
     return;
 }

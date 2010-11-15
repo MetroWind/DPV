@@ -51,13 +51,15 @@ void PDFWindow :: bindKeys()
     NameToFunc["moveUp"] = moveUp;
     NameToFunc["pageDown"] = pageDown;
     NameToFunc["pageUp"] = pageUp;
+    NameToFunc["nextPage"] = nextPage;
+    NameToFunc["prevPage"] = prevPage;
 
     KeyMap::iterator Key;
     KeyMap& Keys = Config.keyBindings();
     for(Key = Keys.begin(); Key != Keys.end(); Key++)
     {
         std::cerr << "Bind " << QKeySequence((*Key).first).toString().toStdString() << std::endl;
-        KeyBindings[QKeySequence((*Key).first)] = funcFromString((*Key).second);
+        KeyBindings[QKeySequence((*Key).first)] = NameToFunc[(*Key).second]; // funcFromString((*Key).second);
     }
 
     return;
@@ -88,5 +90,17 @@ void pageDown(PDFWindow& pdf_win)
 void pageUp(PDFWindow& pdf_win)
 {
     pdf_win.PDF.moveUp(pdf_win.PDF.height() - pdf_win.Config.pageScrollKeep());
+    return;
+}
+
+void nextPage(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.goTo(pdf_win.currentPage() + 1);
+    return;
+}
+
+void prevPage(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.goTo(pdf_win.currentPage() - 1);
     return;
 }

@@ -29,10 +29,14 @@ public:
     PDFWindow(const QString& filename, PDFViewerConfig& config, QWidget* parent = 0);
     ~PDFWindow();
 
+    int currentPage() { return PDF.currentPage(); }
+    
     friend void moveDown(PDFWindow& pdf_win);
     friend void moveUp(PDFWindow& pdf_win);
     friend void pageDown(PDFWindow& pdf_win);
     friend void pageUp(PDFWindow& pdf_win);
+    friend void nextPage(PDFWindow& pdf_win);
+    friend void prevPage(PDFWindow& pdf_win);
 };
 
 void defaultAction(PDFWindow& pdf_win);
@@ -41,6 +45,8 @@ void moveDown(PDFWindow& pdf_win);
 void moveUp(PDFWindow& pdf_win);
 void pageDown(PDFWindow& pdf_win);
 void pageUp(PDFWindow& pdf_win);
+void nextPage(PDFWindow& pdf_win);
+void prevPage(PDFWindow& pdf_win);
 
 typedef std::map<QString, PDFWindow::FuncPt> FuncNameMap;
 static FuncNameMap NameToFunc;
