@@ -35,16 +35,6 @@ void PDFWindow :: keyPressEvent(QKeyEvent* event)
     return;
 }
 
-PDFWindow::FuncPt PDFWindow :: funcFromString(const QString& str)
-{
-    if(NameToFunc.find(str) != NameToFunc.end())
-    {
-        return NameToFunc[str];
-    }
-        
-    return 0;
-}
-
 void PDFWindow :: bindKeys()
 {
     NameToFunc["moveDown"] = moveDown;

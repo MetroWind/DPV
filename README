@@ -7,8 +7,7 @@ Viewer".  It is supposed to be minimal, or even less than that.
 
 * Compilation
 
-$ qmake
-$ make
+$ qmake && make
 
 * Usage
 
