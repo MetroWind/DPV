@@ -31,7 +31,7 @@ public:
 
     int totalPages();
     QSize pageSize(const int pagenum, const int dpi);
-    VerticalPosInPDF PosInPDFFromHere(const int dpi, const int page, const int y,
+    VerticalPosInPDF posInPDFFromHere(const int dpi, const int page, const int y,
                                       const int offset_between_pages, const int offset);
 };
 

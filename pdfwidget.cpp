@@ -30,21 +30,28 @@ PDFDisplay :: ~PDFDisplay()
 
 void PDFDisplay :: updateLastPageShownInfo()
 {
-    QSize PageSize = PDF.pageSize(CurrentPage, DPI);
-    int HeightRemain = height() - (PageSize.height()
-                                   - ViewPortTopLeftInPage.y())
-        - OffsetBetweenPages;
-    int LastPage = CurrentPage;
-    while(HeightRemain > 0)
-    {
-        LastPage++;
-        HeightRemain -= PDF.pageSize(LastPage, DPI).height() + OffsetBetweenPages;
-    }
-
-    LastPageShown = LastPage;
-    ViewPortBotInLastPageY = PDF.pageSize(LastPage, DPI).height() + HeightRemain + OffsetBetweenPages;
+    VerticalPosInPDF Pos = PDF.posInPDFFromHere(
+        DPI, CurrentPage, ViewPortTopLeftInPage.y(), OffsetBetweenPages, height());
+    LastPageShown = Pos.Page;
+    ViewPortBotInLastPageY = Pos.Y;
 
     return;
+    
+    // QSize PageSize = PDF.pageSize(CurrentPage, DPI);
+    // int HeightRemain = height() - (PageSize.height()
+    //                                - ViewPortTopLeftInPage.y())
+    //     - OffsetBetweenPages;
+    // int LastPage = CurrentPage;
+    // while(HeightRemain > 0)
+    // {
+    //     LastPage++;
+    //     HeightRemain -= PDF.pageSize(LastPage, DPI).height() + OffsetBetweenPages;
+    // }
+
+    // LastPageShown = LastPage;
+    // ViewPortBotInLastPageY = PDF.pageSize(LastPage, DPI).height() + HeightRemain + OffsetBetweenPages;
+
+    // return;
 }
     
 void PDFDisplay :: renderPDF(const int page,
@@ -140,13 +147,13 @@ void PDFDisplay :: setDPI(const int dpi)
 void PDFDisplay :: moveDown(const int offset)
 {
     std::cerr << "Entering PDFDisplay :: moveDown with offset = " << offset << std::endl;
-    VerticalPosInPDF BotLeftDest = PDF.PosInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
+    VerticalPosInPDF BotLeftDest = PDF.posInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
                                                         OffsetBetweenPages, offset);
     
     int Offset = BotLeftDest.Offset;
     if(Offset == 0)
         return;
-    VerticalPosInPDF TopLeftDest = PDF.PosInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
+    VerticalPosInPDF TopLeftDest = PDF.posInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
                                                         OffsetBetweenPages, Offset);
 
     if(Offset < height())
@@ -186,13 +193,13 @@ void PDFDisplay :: moveDown(const int offset)
 void PDFDisplay :: moveUp(const int offset)
 {
     std::cerr << "Entering PDFDisplay :: moveUp with offset = " << offset << std::endl;
-    VerticalPosInPDF TopLeftDest = PDF.PosInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
+    VerticalPosInPDF TopLeftDest = PDF.posInPDFFromHere(DPI, CurrentPage, ViewPortTopLeftInPage.y(),
                                                         OffsetBetweenPages, -offset);
     int Offset = -TopLeftDest.Offset; // Offset >= 0
     if(Offset == 0)
         return;
     
-    VerticalPosInPDF BotLeftDest = PDF.PosInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
+    VerticalPosInPDF BotLeftDest = PDF.posInPDFFromHere(DPI, LastPageShown, ViewPortBotInLastPageY,
                                                         OffsetBetweenPages, -Offset);
     
     if(Offset < height())
@@ -235,12 +242,26 @@ void PDFDisplay :: goTo(const int page)
                                 // nothing.
         return;
     }
-    
-    CurrentPage = page;
-    ViewPortTopLeftInPage.setY(0);
-    ViewPortTopLeftInPage.setX(0);
-    updateLastPageShownInfo();
 
+    if(page == PDF.totalPages() - 1 && PDF.pageSize(page, DPI).height() < height())
+    // We want to go to the last page, and we have to put the last
+    // page down to the bottom of the widget.
+    {
+        LastPageShown = page;
+        ViewPortBotInLastPageY = PDF.pageSize(page, DPI).height();
+        VerticalPosInPDF Pos = PDF.posInPDFFromHere(
+            DPI, page, ViewPortBotInLastPageY, OffsetBetweenPages, -height());
+        CurrentPage = Pos.Page;
+        ViewPortTopLeftInPage.setY(Pos.Y);
+    }
+    else
+    {
+        CurrentPage = page;
+        ViewPortTopLeftInPage.setY(0);
+        ViewPortTopLeftInPage.setX(0);
+        updateLastPageShownInfo();
+    }
+    
     forceRepaint();
     repaint();
     return;

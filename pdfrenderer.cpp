@@ -106,7 +106,7 @@ QSize PDFRenderer :: pageSize(const int pagenum, const int dpi)
     return Size;
 }
 
-VerticalPosInPDF PDFRenderer :: PosInPDFFromHere(
+VerticalPosInPDF PDFRenderer :: posInPDFFromHere(
     const int dpi, const int page, const int y, const int offset_between_pages,
     const int offset)
 {
