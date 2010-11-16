@@ -9,18 +9,30 @@ PDFRenderer :: PDFRenderer()
 
 PDFRenderer :: ~PDFRenderer()
 {
+    destroy();
+}
+
+void PDFRenderer :: destroy()
+{
     if(PDFDoc)
-    {
         delete PDFDoc;
+
+    int PageCount = int(Pages.size());
+    
+    if(PageCount > 0)
+    {
+        for(int i = 0; i < PageCount; i++)
+            delete Pages[i];
+        Pages.clear();
     }
+    return;
 }
 
 bool PDFRenderer :: loadFromFile(const QString& filename)
 {
     std::cerr << "Entering PDFRenderer :: loadFromFile" << std::endl;
     
-    if(PDFDoc)
-        delete PDFDoc;
+    destroy();
     
     PDFDoc = Poppler::Document::load(filename);
     if(!PDFDoc || PDFDoc -> isLocked())
@@ -33,6 +45,11 @@ bool PDFRenderer :: loadFromFile(const QString& filename)
     {
         PDFDoc -> setRenderHint(Poppler::Document::TextAntialiasing);
         PDFDoc -> setRenderHint(Poppler::Document::TextHinting, false);
+
+        for(int i = 0; i < totalPages(); i++)
+        {
+            Pages.push_back(PDFDoc -> page(i));
+        }
         
         std::cerr << "PDFRenderer :: loadFromFile returns true." << std::endl;
         return true;
@@ -49,14 +66,18 @@ QImage PDFRenderer :: render(const int page, const int dpi,
               << width << 'x' << height << '+'
               << x << '+' << y << std::endl;
 
-    assert(PDFDoc != 0);
-    
-    Poppler::Page* CurrentPage = PDFDoc -> page(page);
+    assert(PDFDoc != 0 && 0 <= page && page < totalPages());
+
+    Poppler::Page* CurrentPage = Pages[page];
+    CurrentPage -> pageSize();
+
     if(!CurrentPage)
     {
         std::cerr << "Cannot open page " << page << std::endl;
     }
+
     QSize PageSize = pageSize(CurrentPage, dpi);
+    
     int Width = width;
     int Height = height;
     QImage Result;
@@ -72,7 +93,6 @@ QImage PDFRenderer :: render(const int page, const int dpi,
     
     Result = CurrentPage -> renderToImage(dpi, dpi, x, y, Width, Height);
 
-    delete CurrentPage;
     std::cerr << "Leaving PDFRenderer :: render" << std::endl;
     return Result;
 }
@@ -96,10 +116,9 @@ QSize PDFRenderer :: pageSize(Poppler::Page* page, const int dpi)
 QSize PDFRenderer :: pageSize(const int pagenum, const int dpi)
 {
     assert(pagenum >= 0 && pagenum < totalPages() && dpi > 0);
-    Poppler::Page* Page = PDFDoc -> page(pagenum);
+    Poppler::Page* Page = Pages[pagenum];
 
     QSize Size = Page -> pageSize();
-    delete Page;
     
     Size.rwidth() *= double(dpi) / double(72);
     Size.rheight() *= double(dpi) / double(72);
