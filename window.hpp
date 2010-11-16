@@ -20,6 +20,8 @@ private:
     
     void bindKeys();
     FuncPt funcFromString(const QString& str);
+
+    QString NumPrefix;
     
 protected:
     void resizeEvent(QResizeEvent* event);

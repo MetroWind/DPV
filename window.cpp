@@ -24,6 +24,15 @@ void PDFWindow :: resizeEvent(QResizeEvent* event)
 
 void PDFWindow :: keyPressEvent(QKeyEvent* event)
 {
+    int Key = event -> key();
+    if(Key >= Qt::Key_0 && Key <= Qt::Key_9
+       && event -> modifiers() == Qt::NoModifier)
+    {                           // The input is a number
+        NumPrefix.append(Key);  // Key is also the ascii/unicode of the character.
+        std::cerr << "NumPrefix = " << NumPrefix.toStdString() << std::endl;
+        return;
+    }
+        
     QKeySequence Seq(event -> key() + event -> modifiers());
     if(KeyBindings.find(Seq) == KeyBindings.end())
     {
@@ -32,6 +41,8 @@ void PDFWindow :: keyPressEvent(QKeyEvent* event)
     }
     
     KeyBindings[Seq](*this);
+
+    NumPrefix.clear();
     return;
 }
 
