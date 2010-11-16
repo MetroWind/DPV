@@ -41,6 +41,8 @@ public:
     friend void prevPage(PDFWindow& pdf_win);
     friend void reload(PDFWindow& pdf_win);
     friend void goToPage(PDFWindow& pdf_win);
+    friend void firstPage(PDFWindow& pdf_win);
+    friend void lastPage(PDFWindow& pdf_win);
 };
 
 void defaultAction(PDFWindow& pdf_win);
@@ -53,6 +55,8 @@ void nextPage(PDFWindow& pdf_win);
 void prevPage(PDFWindow& pdf_win);
 void reload(PDFWindow& pdf_win);
 void goToPage(PDFWindow& pdf_win);
+void firstPage(PDFWindow& pdf_win);
+void lastPage(PDFWindow& pdf_win);
 
 typedef std::map<QString, PDFWindow::FuncPt> FuncNameMap;
 static FuncNameMap NameToFunc;

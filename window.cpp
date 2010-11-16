@@ -37,6 +37,7 @@ void PDFWindow :: keyPressEvent(QKeyEvent* event)
     QKeySequence Seq(event -> key() + event -> modifiers());
     if(KeyBindings.find(Seq) == KeyBindings.end())
     {
+        std::cerr << Seq.toString().toStdString() << " captured.  ";
         defaultAction(*this);
         return;
     }
@@ -57,6 +58,8 @@ void PDFWindow :: bindKeys()
     NameToFunc["prevPage"] = prevPage;
     NameToFunc["reload"] = reload;
     NameToFunc["goToPage"] = goToPage;
+    NameToFunc["firstPage"] = firstPage;
+    NameToFunc["lastPage"] = lastPage;
 
     KeyMap::iterator Key;
     KeyMap& Keys = Config.keyBindings();
@@ -127,5 +130,17 @@ void goToPage(PDFWindow& pdf_win)
         return;
     
     pdf_win.PDF.goTo(DestPage - 1);
+    return;
+}
+
+void firstPage(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.goTo(0);
+    return;
+}
+
+void lastPage(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.goTo(pdf_win.PDF.totalPages() - 1);
     return;
 }

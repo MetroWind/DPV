@@ -24,6 +24,9 @@ PDFViewerConfig :: PDFViewerConfig()
     KeyBindings["Alt+v"] = "pageUp";
     KeyBindings["Shift+j"] = "nextPage";
     KeyBindings["Shift+k"] = "prevPage";
+    KeyBindings["Alt+Shift+<"] = "firstPage";
+    KeyBindings["Alt+Shift+>"] = "lastPage";
+    KeyBindings["Shift+g"] = "lastPage";
 }
 
 // ============================================================
