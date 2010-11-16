@@ -15,6 +15,7 @@ PDFDisplay :: PDFDisplay(const QString& filename, const int initial_dpi,
     LastPageShown = 0;
     ViewPortTopLeftInPage.setX(0);
     ViewPortTopLeftInPage.setY(0);
+    FileName = filename;
 }
 
 PDFDisplay :: ~PDFDisplay()
@@ -242,5 +243,15 @@ void PDFDisplay :: goTo(const int page)
 
     forceRepaint();
     repaint();
+    return;
+}
+
+void PDFDisplay :: reload()
+{
+    assert(!FileName.isEmpty());
+    PDF.loadFromFile(FileName);
+    forceRepaint();
+    repaint();
+    
     return;
 }

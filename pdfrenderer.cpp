@@ -19,6 +19,9 @@ bool PDFRenderer :: loadFromFile(const QString& filename)
 {
     std::cerr << "Entering PDFRenderer :: loadFromFile" << std::endl;
     
+    if(PDFDoc)
+        delete PDFDoc;
+    
     PDFDoc = Poppler::Document::load(filename);
     if(!PDFDoc || PDFDoc -> isLocked())
     {
@@ -69,6 +72,7 @@ QImage PDFRenderer :: render(const int page, const int dpi,
     
     Result = CurrentPage -> renderToImage(dpi, dpi, x, y, Width, Height);
 
+    delete CurrentPage;
     std::cerr << "Leaving PDFRenderer :: render" << std::endl;
     return Result;
 }
@@ -95,6 +99,8 @@ QSize PDFRenderer :: pageSize(const int pagenum, const int dpi)
     Poppler::Page* Page = PDFDoc -> page(pagenum);
 
     QSize Size = Page -> pageSize();
+    delete Page;
+    
     Size.rwidth() *= double(dpi) / double(72);
     Size.rheight() *= double(dpi) / double(72);
     return Size;

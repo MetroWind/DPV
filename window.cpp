@@ -43,6 +43,7 @@ void PDFWindow :: bindKeys()
     NameToFunc["pageUp"] = pageUp;
     NameToFunc["nextPage"] = nextPage;
     NameToFunc["prevPage"] = prevPage;
+    NameToFunc["reload"] = reload;
 
     KeyMap::iterator Key;
     KeyMap& Keys = Config.keyBindings();
@@ -92,5 +93,11 @@ void nextPage(PDFWindow& pdf_win)
 void prevPage(PDFWindow& pdf_win)
 {
     pdf_win.PDF.goTo(pdf_win.currentPage() - 1);
+    return;
+}
+
+void reload(PDFWindow& pdf_win)
+{
+    pdf_win.PDF.reload();
     return;
 }

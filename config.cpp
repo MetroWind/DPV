@@ -18,6 +18,7 @@ PDFViewerConfig :: PDFViewerConfig()
     // ============================================================
     KeyBindings["j"] = "moveDown";
     KeyBindings["k"] = "moveUp";
+    KeyBindings["r"] = "reload";
     KeyBindings["Ctrl+v"] = "pageDown";
     KeyBindings["Alt+v"] = "pageUp";
     KeyBindings["Shift+j"] = "nextPage";

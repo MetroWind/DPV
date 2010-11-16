@@ -20,6 +20,7 @@ private:
     QPixmap CurrentImg;
     PDFRenderer PDF;
     const int OffsetBetweenPages;
+    QString FileName;
 
     void updateLastPageShownInfo();
     void forceRepaint();        // Updates `CurrentImg', but does not repaint.
@@ -43,6 +44,7 @@ public:
     void moveDown(const int offset);
     void moveUp(const int offset);
     void goTo(const int page);
+    void reload();
 };
 
 #endif
