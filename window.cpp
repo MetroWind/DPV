@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include "window.hpp"
 
 PDFWindow :: PDFWindow(const QString& filename, PDFViewerConfig& config, QWidget* parent)
@@ -55,6 +56,7 @@ void PDFWindow :: bindKeys()
     NameToFunc["nextPage"] = nextPage;
     NameToFunc["prevPage"] = prevPage;
     NameToFunc["reload"] = reload;
+    NameToFunc["goToPage"] = goToPage;
 
     KeyMap::iterator Key;
     KeyMap& Keys = Config.keyBindings();
@@ -110,5 +112,20 @@ void prevPage(PDFWindow& pdf_win)
 void reload(PDFWindow& pdf_win)
 {
     pdf_win.PDF.reload();
+    return;
+}
+
+void goToPage(PDFWindow& pdf_win)
+{
+    if(pdf_win.NumPrefix.isEmpty())
+        return;
+
+    bool IsOk;
+    int DestPage = pdf_win.NumPrefix.toInt(&IsOk);
+    assert(DestPage >= 0 && IsOk);
+    if(DestPage >= pdf_win.PDF.totalPages())
+        return;
+    
+    pdf_win.PDF.goTo(DestPage - 1);
     return;
 }

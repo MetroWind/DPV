@@ -36,9 +36,8 @@ public:
 
     void setDPI(const int dpi);
     int currentPage() { return CurrentPage; }
+    int totalPages() { return PDF.totalPages(); }
     
-    // void loadFromFile(const QString& filename);
-    // void renderPDF(QPainter& painter);
     void renderPDF(const int page,
                    const QPoint& offset_on_pdf, const QRect& region_on_widget);
     void moveDown(const int offset);
