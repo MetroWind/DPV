@@ -1,6 +1,7 @@
 #ifndef PDFRENDERER_H
 #define PDFRENDERER_H
 
+#include <vector>
 #include <QString>
 #include <QImage>
 #include <poppler-qt4.h>
@@ -12,10 +13,14 @@ typedef struct _vert_pos_in_pdf
     int Offset;
 } VerticalPosInPDF;
 
+typedef std::vector<Poppler::Page*> PageList;
+
 class PDFRenderer
 {
 private:
     Poppler::Document* PDFDoc;
+    PageList Pages;
+    void destroy();
     QSize pageSize(Poppler::Page* page, const int dpi); // Returns size in pixel.
 public:
     PDFRenderer();
