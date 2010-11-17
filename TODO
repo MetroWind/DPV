@@ -1,4 +1,1 @@
-* When load a file, store all Poppler::Page* into a vector.
-
-Rewrite PDFDisplay :: updateLastPageShownInfo() to use PDFRenderer ::
-PosInPDFFromHere()?
+Eliminate warnings.

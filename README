@@ -9,6 +9,10 @@ Viewer".  It is supposed to be minimal, or even less than that.
 
 $ qmake && make
 
+* Configuration
+
+Change config.cpp.  Don't forget to backup~~
+
 * Usage
 
 dpv filename

@@ -36,22 +36,6 @@ void PDFDisplay :: updateLastPageShownInfo()
     ViewPortBotInLastPageY = Pos.Y;
 
     return;
-    
-    // QSize PageSize = PDF.pageSize(CurrentPage, DPI);
-    // int HeightRemain = height() - (PageSize.height()
-    //                                - ViewPortTopLeftInPage.y())
-    //     - OffsetBetweenPages;
-    // int LastPage = CurrentPage;
-    // while(HeightRemain > 0)
-    // {
-    //     LastPage++;
-    //     HeightRemain -= PDF.pageSize(LastPage, DPI).height() + OffsetBetweenPages;
-    // }
-
-    // LastPageShown = LastPage;
-    // ViewPortBotInLastPageY = PDF.pageSize(LastPage, DPI).height() + HeightRemain + OffsetBetweenPages;
-
-    // return;
 }
     
 void PDFDisplay :: renderPDF(const int page,
