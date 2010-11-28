@@ -12,6 +12,7 @@ PDFViewerConfig :: PDFViewerConfig()
     PageScrollKeep = 32;        // Number of pixels in what you are
                                 // seeing now to remain visible after
                                 // a page scroll.
+    Hinting = true;            // Whether to apply hinting to text
 
     // ============================================================
     // -------------------- Key Bindings --------------------------

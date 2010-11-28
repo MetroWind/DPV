@@ -125,6 +125,12 @@ QSize PDFRenderer :: pageSize(const int pagenum, const int dpi)
     return Size;
 }
 
+void PDFRenderer :: setHinting(const bool hinting)
+{
+    PDFDoc -> setRenderHint(Poppler::Document::TextHinting, hinting);
+    return;
+}
+
 VerticalPosInPDF PDFRenderer :: posInPDFFromHere(
     const int dpi, const int page, const int y, const int offset_between_pages,
     const int offset)

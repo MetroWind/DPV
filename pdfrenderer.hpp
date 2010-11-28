@@ -38,6 +38,8 @@ public:
     QSize pageSize(const int pagenum, const int dpi);
     VerticalPosInPDF posInPDFFromHere(const int dpi, const int page, const int y,
                                       const int offset_between_pages, const int offset);
+
+    void setHinting(const bool hinting);
 };
 
 #endif

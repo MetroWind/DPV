@@ -3,7 +3,8 @@
 #include "window.hpp"
 
 PDFWindow :: PDFWindow(const QString& filename, PDFViewerConfig& config, QWidget* parent)
-: Config(config), PDF(filename, config.initialDPI(), config.offsetBetweenPages(), parent),
+    : Config(config), PDF(filename, config.initialDPI(), config.offsetBetweenPages(),
+                      config.hinting(), parent),
     QWidget(parent)
 {
     Layout.setContentsMargins(0, 0, 0, 0);

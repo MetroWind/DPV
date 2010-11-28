@@ -15,6 +15,7 @@ private:
     int MoveStep;
     KeyMap KeyBindings;
     int PageScrollKeep;
+    bool Hinting;
 
 public:
     PDFViewerConfig();                   // Sets the default value of all options.
@@ -27,7 +28,8 @@ public:
     void setOffsetBetweenPages(const int offset);
     int moveStep() { return MoveStep; }
     int pageScrollKeep() { return PageScrollKeep; }
-
+    bool hinting() { return Hinting; }
+    
     KeyMap& keyBindings() { return KeyBindings; }
 };
 

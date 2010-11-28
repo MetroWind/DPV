@@ -4,13 +4,16 @@
 #include "pdfwidget.hpp"
 
 PDFDisplay :: PDFDisplay(const QString& filename, const int initial_dpi,
-                         const int offset_between_pages, QWidget* parent)
-: DPI(initial_dpi), OffsetBetweenPages(offset_between_pages), QWidget(parent)
+                         const int offset_between_pages, const bool hinting,
+                         QWidget* parent)
+    : DPI(initial_dpi), OffsetBetweenPages(offset_between_pages), Hinting(hinting),
+    QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // setStyleSheet("background-color: blue;");
 
     PDF.loadFromFile(filename);
+    PDF.setHinting(hinting);
     CurrentPage = 0;
     LastPageShown = 0;
     ViewPortTopLeftInPage.setX(0);
@@ -125,6 +128,15 @@ void PDFDisplay :: setDPI(const int dpi)
 {
     assert(dpi > 0);
     DPI = dpi;
+    return;
+}
+
+void PDFDisplay :: setHinting(const bool hinting)
+{
+    PDF.setHinting(hinting);
+    Hinting = hinting;
+    // forceRepaint();
+    // repaint();
     return;
 }
 
@@ -255,6 +267,7 @@ void PDFDisplay :: reload()
 {
     assert(!FileName.isEmpty());
     PDF.loadFromFile(FileName);
+    PDF.setHinting(Hinting);
     forceRepaint();
     repaint();
     
