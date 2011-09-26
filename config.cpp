@@ -6,13 +6,13 @@ PDFViewerConfig :: PDFViewerConfig()
     // ============================================================
     // ------------------- Specify options below ------------------
     // ============================================================
-    InitialDPI = 113;           // Initial DPI, dah~
+    InitialDPI = 128;           // Initial DPI, dah~
     OffsetBetweenPages = 4;     // The space between two adjacent pages
     MoveStep = 32;              // The distance of normal navigational move
     PageScrollKeep = 32;        // Number of pixels in what you are
                                 // seeing now to remain visible after
                                 // a page scroll.
-    Hinting = true;            // Whether to apply hinting to text
+    Hinting = false;            // Whether to apply hinting to text
 
     // ============================================================
     // -------------------- Key Bindings --------------------------
