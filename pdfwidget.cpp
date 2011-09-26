@@ -77,8 +77,15 @@ void PDFDisplay :: renderPDF(const int page,
         Renderer.drawImage(region_on_widget.x(), region_on_widget.y()
                            + region_on_widget.height() - HeightRemain, RenderedImg);
 
+        // Prepare to go across page.
         HeightRemain -= PageSize.height() - Y;
+        // Before we go across page, fill the gap.
+        Renderer.fillRect(region_on_widget.x(), region_on_widget.y()
+                          + region_on_widget.height() - HeightRemain,
+                          PageSize.width(), OffsetBetweenPages, Qt::black);
+        
         HeightRemain -= OffsetBetweenPages;
+        
         PageToRender++;         // Go across page!
         Y = 0;
     }
@@ -119,6 +126,8 @@ void PDFDisplay :: paintEvent(QPaintEvent* event)
 void PDFDisplay :: forceRepaint()
 {
     CurrentImg = QPixmap(width(), height());
+    CurrentImg.fill(Qt::black);
+    
     renderPDF(CurrentPage, QPoint(ViewPortTopLeftInPage.x(), ViewPortTopLeftInPage.y()),
               QRect(0, 0, width(), height()));
     return;
